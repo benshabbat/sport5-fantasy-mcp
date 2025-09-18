@@ -1,11 +1,10 @@
 {
   "mcpServers": {
     "sport5-fantasy-oauth": {
-      "command": "uvx",
+      "command": "python",
       "args": [
-        "mcp@latest",
-        "run",
-        "https://github.com/benshabbat/sport5-fantasy-mcp/blob/main/sport5_mcp_google.py"
+        "-c",
+        "import subprocess, sys; subprocess.run([sys.executable, '-m', 'pip', 'install', 'git+https://github.com/benshabbat/sport5-fantasy-mcp.git']); from sport5_mcp_google import main; main()"
       ],
       "env": {
         "GOOGLE_CLIENT_ID": "your-google-client-id-here.apps.googleusercontent.com",
