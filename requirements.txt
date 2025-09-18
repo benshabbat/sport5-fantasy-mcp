@@ -1,0 +1,6 @@
+aiohttp==3.9.3
+beautifulsoup4==4.12.3
+mcp==1.0.0
+lxml==5.1.0
+aiohttp-cors==0.7.0
+python-dotenv==1.0.1
