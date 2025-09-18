@@ -14,7 +14,7 @@ import * as cheerio from 'cheerio';
 
 // Fantasy League API configuration
 interface Sport5Config {
-  baseUrl: string;
+  baseUrl?: string;
   authCookie?: string;
   userId?: string;
   leagueId?: string;
@@ -57,8 +57,8 @@ class Sport5FantasyAPI {
 
   constructor(config: Sport5Config) {
     this.config = {
-      baseUrl: 'https://fantasyleague.sport5.co.il',
-      ...config
+      ...config,
+      baseUrl: config.baseUrl || 'https://fantasyleague.sport5.co.il'
     };
     this.session = axios.create({
       baseURL: this.config.baseUrl,
@@ -300,7 +300,7 @@ class Sport5FantasyAPI {
       $('.player-row').each((index, element) => {
         const $el = $(element);
         players.push({
-          id: $el.data('player-id') || '',
+          id: String($el.data('player-id')) || '',
           name: $el.find('.player-name').text().trim(),
           team: $el.find('.player-team').text().trim(),
           position: $el.find('.player-position').text().trim(),
@@ -336,8 +336,11 @@ const server = new Server(
 let fantasyAPI: Sport5FantasyAPI;
 
 // Initialize API with configuration
-function initializeAPI(config?: Sport5Config) {
-  fantasyAPI = new Sport5FantasyAPI(config || {});
+function initializeAPI(config?: Partial<Sport5Config>) {
+  const defaultConfig: Sport5Config = {
+    baseUrl: 'https://fantasyleague.sport5.co.il'
+  };
+  fantasyAPI = new Sport5FantasyAPI({ ...defaultConfig, ...config });
 }
 
 // Define tools
@@ -479,7 +482,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
   try {
     switch (name) {
       case 'configure_api':
-        initializeAPI(args as Sport5Config);
+        initializeAPI(args as Partial<Sport5Config>);
         return {
           content: [
             {
@@ -515,12 +518,13 @@ ${team.players.map(player =>
       case 'get_all_players':
         let players = await fantasyAPI.getAllPlayers();
         
-        if (args?.position) {
+        if (args?.position && typeof args.position === 'string') {
           players = players.filter(p => p.position === args.position);
         }
         
-        if (args?.maxPrice) {
-          players = players.filter(p => p.price <= args.maxPrice);
+        if (args?.maxPrice && typeof args.maxPrice === 'number') {
+          const maxPrice = args.maxPrice;
+          players = players.filter(p => p.price <= maxPrice);
         }
 
         // Sort by points descending
@@ -544,8 +548,9 @@ ${players.length > 20 ? `\n...ועוד ${players.length - 20} שחקנים` : ''
         };
 
       case 'get_top_performers':
-        const topPerformers = await fantasyAPI.getTopPerformers(args?.gameweek);
-        const limit = args?.limit || 10;
+        const gameweek = typeof args?.gameweek === 'number' ? args.gameweek : undefined;
+        const topPerformers = await fantasyAPI.getTopPerformers(gameweek);
+        const limit = typeof args?.limit === 'number' ? args.limit : 10;
 
         return {
           content: [
@@ -624,7 +629,8 @@ ${optimization.recommendedChanges.length > 0
         };
 
       case 'get_gameweek_stats':
-        const stats = await fantasyAPI.getGameweekStats(args?.gameweek);
+        const statsGameweek = typeof args?.gameweek === 'number' ? args.gameweek : undefined;
+        const stats = await fantasyAPI.getGameweekStats(statsGameweek);
 
         return {
           content: [
