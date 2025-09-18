@@ -1,0 +1,41 @@
+{
+  "name": "sport5-fantasy-mcp",
+  "version": "1.0.0",
+  "description": "MCP Server for Sport5 Fantasy League automation",
+  "main": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsx src/index.ts",
+    "watch": "tsx watch src/index.ts",
+    "setup": "npm run build && node scripts/setup.js",
+    "extract-cookies": "node scripts/cookie-extractor.js"
+  },
+  "keywords": [
+    "mcp",
+    "fantasy",
+    "sport5",
+    "football",
+    "israel"
+  ],
+  "author": "Sport5 Fantasy User",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^0.5.0",
+    "axios": "^1.6.0",
+    "cheerio": "^1.0.0-rc.12",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "tsx": "^4.0.0",
+    "typescript": "^5.0.0"
+  },
+  "files": [
+    "dist/**/*"
+  ],
+  "bin": {
+    "sport5-fantasy-mcp": "./dist/index.js"
+  }
+}
